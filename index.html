@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aviator Pro Bot - Daniel Costa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f0f1a 100%);
+      background-attachment: fixed;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease-in-out infinite;
+      margin-bottom: 10px;
+      text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      color: #b0b0b0;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .glow-button {
+      margin: 15px 0;
+      padding: 18px 36px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+      box-shadow: 
+        0 8px 25px rgba(255, 107, 107, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .glow-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .glow-button:hover::before {
+      left: 100%;
+    }
+
+    .glow-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 12px 35px rgba(255, 107, 107, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .glow-button:active {
+      transform: translateY(0);
+    }
+
+    input {
+      padding: 16px 20px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 400px;
+      margin: 15px auto;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      font-family: 'Exo 2', sans-serif;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4ecdc4;
+      box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    input::placeholder {
+      color: #b0b0b0;
+    }
+
+    .hidden { 
+      display: none !important; 
+    }
+
+    .airplane-container {
+      width: 100%;
+      max-width: 500px;
+      height: 300px;
+      margin: 30px auto;
+      background: 
+        linear-gradient(135deg, rgba(16, 16, 34, 0.9), rgba(25, 25, 50, 0.9)),
+        url('growth_graph.png') no-repeat center center;
+      background-size: cover;
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .airplane-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(78, 205, 196, 0.1) 50%, transparent 70%);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .airplane {
+      width: 70px;
+      position: absolute;
+      top: 80%;
+      left: -100px;
+      animation: flyplane 6s ease-in-out infinite;
+      z-index: 2;
+      filter: drop-shadow(0 0 10px rgba(78, 205, 196, 0.5));
+    }
+
+    @keyframes flyplane {
+      0% { 
+        left: -100px; 
+        top: 80%; 
+        transform: rotate(15deg) scale(1);
+      }
+      25% {
+        top: 60%;
+        transform: rotate(5deg) scale(1.1);
+      }
+      50% {
+        top: 40%;
+        transform: rotate(-5deg) scale(1);
+      }
+      75% {
+        top: 20%;
+        transform: rotate(-10deg) scale(0.9);
+      }
+      100% { 
+        left: 100%; 
+        top: 10%; 
+        transform: rotate(-15deg) scale(0.8);
+      }
+    }
+
+    #coefficient-box {
+      margin: 30px auto;
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(238, 90, 36, 0.2));
+      padding: 25px 40px;
+      border-radius: 20px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      color: #ff6b6b;
+      animation: pulse 2s ease-in-out infinite;
+      box-shadow: 
+        0 15px 35px rgba(255, 107, 107, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      width: auto;
+      max-width: 90%;
+      text-align: center;
+      border: 2px solid rgba(255, 107, 107, 0.3);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #coefficient-box::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(transparent, rgba(255, 107, 107, 0.1), transparent);
+      animation: rotate 3s linear infinite;
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+        box-shadow: 
+          0 15px 35px rgba(255, 107, 107, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+      50% { 
+        opacity: 0.8; 
+        transform: scale(1.05);
+        box-shadow: 
+          0 20px 45px rgba(255, 107, 107, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .ticker {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 15px 25px;
+      margin-bottom: 25px;
+      font-size: 16px;
+      color: #b0b0b0;
+      white-space: nowrap;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+
+    .screen {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 40px;
+      margin: 20px 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .accuracy-display {
+      font-size: 1.5rem;
+      color: #4ecdc4;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+    }
+
+    .contact-info {
+      background: rgba(78, 205, 196, 0.1);
+      border: 1px solid rgba(78, 205, 196, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .contact-info a {
+      color: #4ecdc4;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .contact-info a:hover {
+      color: #45b7d1;
+      text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+    }
+
+    .error-message {
+      color: #ff6b6b;
+      font-weight: 600;
+      margin: 15px 0;
+      text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+    }
+
+    .password-label {
+      font-size: 1.2rem;
+      color: #fff;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .header {
+        margin-bottom: 20px;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+        margin-bottom: 5px;
+      }
+      
+      .header p {
+        font-size: 1rem;
+      }
+      
+      .ticker {
+        padding: 10px 15px;
+        margin-bottom: 15px;
+        font-size: 14px;
+      }
+      
+      .airplane-container {
+        height: 200px;
+        margin: 15px auto;
+        max-width: 350px;
+      }
+      
+      .airplane {
+        width: 50px;
+      }
+      
+      .screen {
+        padding: 20px 15px;
+        margin: 10px 0;
+      }
+      
+      .screen h2 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+      }
+      
+      .screen p {
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+      }
+      
+      .glow-button {
+        padding: 12px 24px;
+        font-size: 14px;
+        margin: 8px 0;
+      }
+      
+      .accuracy-display {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+      }
+      
+      .password-label {
+        font-size: 1rem;
+        margin-bottom: 10px;
+      }
+      
+      input {
+        padding: 12px 15px;
+        font-size: 14px;
+        margin: 10px 0;
+      }
+      
+      #coefficient-box {
+        padding: 15px 20px;
+        font-size: 1.5rem;
+        margin: 15px auto;
+      }
+      
+      .contact-info {
+        padding: 15px;
+        margin-top: 15px;
+      }
+      
+      .contact-info p {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+      }
+      
+      .error-message {
+        font-size: 0.9rem;
+        margin: 10px 0;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 8px;
+      }
+      
+      .header h1 {
+        font-size: 1.8rem;
+      }
+      
+      .airplane-container {
+        height: 150px;
+        margin: 10px auto;
+        max-width: 300px;
+      }
+      
+      .airplane {
+        width: 40px;
+      }
+      
+      .screen {
+        padding: 15px 10px;
+        margin: 8px 0;
+      }
+      
+      .screen h2 {
+        font-size: 1.2rem;
+      }
+      
+      .glow-button {
+        padding: 10px 20px;
+        font-size: 13px;
+      }
+      
+      #coefficient-box {
+        padding: 12px 15px;
+        font-size: 1.3rem;
+      }
+      
+      .ticker {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+    }
+
+    .floating-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(78, 205, 196, 0.6);
+      border-radius: 50%;
+      animation: float 6s infinite linear;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-particles" id="particles"></div>
+  
+  <div class="container">
+    <div class="header">
+      <h1>Aviator Bot</h1>
+    </div>
+
+    <div class="ticker" id="history-ticker">Coefficienti Recenti: —</div>
+
+    <div class="airplane-container">
+      <img src="airplane.png" class="airplane" alt="Aereo volante" />
+    </div>
+
+    <div id="coefficient-box" class="hidden">Coefficiente</div>
+
+    <div id="start-screen" class="screen">
+      <h2>Benvenuto in Aviator Pro Bot</h2>
+      <p>Ottieni previsioni accurate per il tuo prossimo volo</p>
+      <button class="glow-button" onclick="showPasswordPrompt()">Inizia Previsione</button>
+    </div>
+
+    <!-- Honeypot to confuse autofill -->
+    <input type="text" name="fakeusernameremembered" style="display:none">
+    <input type="password" name="fakepasswordremembered" style="display:none">
+
+    <div id="password-screen" class="screen hidden">
+      <h2>Accesso Richiesto</h2>
+      <p class="password-label">Inserisci il tuo codice di accesso:</p>
+      <input
+        type="password"
+        id="psw-input-custom"
+        name="no-password-here"
+        placeholder="Inserisci codice di accesso"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+      <br>
+      <button class="glow-button" onclick="checkPassword()">Accedi al Sistema</button>
+      
+      <div id="wrong-password" class="hidden">
+        <p class="error-message">Codice di accesso non valido.</p>
+        <div class="contact-info">
+          <p>Per attivare il bot e ricevere il tuo codice di accesso, contatta:</p>
+          <p><a href="https://t.me/daniel_costa_dc" target="_blank">@daniel_costa_dc</a></p>
+        </div>
+        <button class="glow-button" onclick="contactAdmin()">Ottieni Codice di Accesso</button>
+      </div>
+    </div>
+
+    <div id="main-screen" class="screen hidden">
+      <div class="accuracy-display">Precisione: <span id="accuracy">100%</span></div>
+      <p>Pronto a dare il tuo prossimo coefficiente</p>
+      <button class="glow-button" onclick="generateCoefficient()">Dai Coefficiente</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 50;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 6 + 's';
+        particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    // Initialize particles when page loads
+    document.addEventListener('DOMContentLoaded', createParticles);
+  </script>
+</body>
+</html>
