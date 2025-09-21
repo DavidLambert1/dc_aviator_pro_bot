@@ -7,7 +7,7 @@ function showPasswordPrompt() {
 }
 
 function checkPassword() {
-  const input = document.getElementById("psw-input").value;
+  const input = document.getElementById("psw-input-custom").value;
   if (input === PASSWORD) {
     document.getElementById("password-screen").classList.add("hidden");
     document.getElementById("main-screen").classList.remove("hidden");
@@ -16,10 +16,15 @@ function checkPassword() {
   }
 }
 
+function contactAdmin() {
+  window.open("https://t.me/daniel_costa_dc", "_blank");
+}
+
 function generateCoefficient() {
   const value = randomInRange(1, 1.5);
   const box = document.getElementById("coefficient-box");
-  box.innerText = `Koeffizient: ${parseFloat(value).toFixed(2)}`;
+  box.innerText = `Coefficiente: ${parseFloat(value).toFixed(2)}`;
+  box.classList.remove("hidden");
   updateHistory(parseFloat(value).toFixed(2));
 }
 
@@ -31,5 +36,5 @@ function updateHistory(value) {
   history.unshift(value);
   if (history.length > 10) history.pop();
   document.getElementById("history-ticker").innerText =
-    "Letzte Koeffizienten: " + history.join(" • ");
+    "Coefficienti Recenti: " + history.join(" • ");
 }
