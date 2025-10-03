@@ -21,7 +21,7 @@ function contactAdmin() {
 }
 
 function generateCoefficient() {
-  const value = randomInRange(1, 1.5);
+  const value = randomInRange(6, 300);
   const box = document.getElementById("coefficient-box");
   box.innerText = `Coefficiente: ${parseFloat(value).toFixed(2)}`;
   box.classList.remove("hidden");
